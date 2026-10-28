@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ابزار محاسبه NPV | مرکز توسعه کسب و کار ایران-بریتانیا</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0b1f3a;--navy2:#16355f;--gold:#c9a24a;--gold2:#e8cd8a;--bg:#f5f2ea;--card:#fff;--ink:#1d2433;--mute:#6b7488;--ok:#17855a;--bad:#c23a3a;--line:#e6e0d1}
+*{box-sizing:border-box;margin:0}
+body{font-family:Vazirmatn,Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.9}
+.hero{background:radial-gradient(circle at 20% 10%,#1f4a80 0,var(--navy) 55%);color:#fff;text-align:center;padding:64px 20px 90px;position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(201,162,74,.35)}
+.hero:before{width:420px;height:420px;top:-180px;left:-120px}
+.hero:after{width:300px;height:300px;bottom:-150px;right:-80px}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--gold2);padding:2px 16px;border-radius:30px;font-size:.85rem;margin-bottom:18px}
+.hero h1{font-size:clamp(2rem,6vw,3.4rem);font-weight:800;color:#fff}
+.hero h1 span{color:var(--gold2)}
+.hero p{margin-top:10px;font-size:1.1rem;color:#d7deea}
+.hero .org{margin-top:22px;font-weight:700;color:var(--gold2);font-size:1.05rem}
+.warn{max-width:760px;margin:-44px auto 0;position:relative;z-index:2;background:#fff8e4;border:2px solid var(--gold);border-radius:16px;padding:16px 22px;text-align:center;font-weight:700;color:#7a5a12;box-shadow:0 10px 30px rgba(11,31,58,.15)}
+main{max-width:760px;margin:26px auto 40px;padding:0 16px}
+.card{background:var(--card);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:0 6px 22px rgba(11,31,58,.07);border:1px solid var(--line)}
+.card h2{font-size:1.15rem;color:var(--navy);display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.num{width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--gold2);display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;flex:none}
+.hint{color:var(--mute);font-size:.88rem;margin-bottom:12px}
+label.q{display:block;font-weight:500;margin:14px 0 6px}
+input[type=text]{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:1.05rem;direction:ltr;text-align:left;background:#fcfbf7;transition:.2s}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,.2)}
+select{padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fcfbf7}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;align-items:stretch}
+.row input{flex:1}
+.sign{display:flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;flex:none}
+.sign button{border:0;background:#fcfbf7;font:inherit;font-weight:800;font-size:1.3rem;width:46px;cursor:pointer;color:var(--mute);transition:.15s}
+.sign button.on.p{background:var(--ok);color:#fff}
+.sign button.on.m{background:var(--bad);color:#fff}
+.stepper{display:inline-flex;align-items:center;gap:12px;margin-top:6px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--gold);background:#fff;font-size:1.4rem;color:var(--navy);cursor:pointer}
+.stepper b{font-size:1.4rem;min-width:44px;text-align:center}
+.yr{border-top:1px dashed var(--line);padding-top:6px}
+.yr .q small{display:block;color:var(--mute);font-weight:400;font-size:.82rem}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:1.15rem;cursor:pointer;background:linear-gradient(135deg,var(--gold),#a9852f);color:#fff;box-shadow:0 8px 20px rgba(169,133,47,.35);transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.err{color:var(--bad);font-size:.9rem;margin-top:8px;text-align:center}
+#result{display:none}
+.big{text-align:center;padding:26px 10px;border-radius:16px;margin:10px 0 16px;color:#fff}
+.big.pos{background:linear-gradient(135deg,#17855a,#0f5f40)}
+.big.neg{background:linear-gradient(135deg,#c23a3a,#8d2323)}
+.big.zero{background:linear-gradient(135deg,#6b7488,#4a5164)}
+.big small{opacity:.85}
+.big .v{font-size:clamp(1.8rem,7vw,2.8rem);font-weight:800;direction:rtl;margin:4px 0}
+.note{background:#f1f4fa;border-right:4px solid var(--navy2);padding:12px 16px;border-radius:10px;margin:12px 0;font-size:.95rem}
+.note.gold{background:#fff8e4;border-color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:8px 0}
+th,td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--line)}
+th{color:var(--navy);background:#faf7ee}
+.neg-t{color:var(--bad)}.pos-t{color:var(--ok)}
+.bars div.b{display:flex;align-items:center;gap:8px;font-size:.82rem;margin:3px 0}
+.bars .l{width:60px;flex:none;color:var(--mute)}
+.bars .t{flex:1;height:14px;background:#f1eee4;border-radius:7px;overflow:hidden}
+.bars .t i{display:block;height:100%;border-radius:7px}
+.cta{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center;border:0}
+.cta h2{color:var(--gold2);justify-content:center;font-size:1.3rem}
+.cta p{color:#d7deea;margin:8px 0 18px}
+.cta a{display:inline-block;margin:5px;padding:12px 24px;border-radius:30px;font-weight:700;text-decoration:none;color:#fff}
+.cta .ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}
+.cta .wa{background:#25a65b}
+footer{text-align:center;color:var(--mute);font-size:.82rem;padding:0 16px 30px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="badge">NPV Calculator</div>
+  <h1>ابزار محاسبه <span>NPV</span></h1>
+  <p>ارزش فعلی خالص؛ سنجش اقتصادی بودن پروژه سرمایه‌گذاری شما</p>
+  <div class="org">خدمتی از مرکز توسعه کسب و کار ایران-بریتانیا</div>
+</header>
+<div class="warn">⚠️ هیچ پروژه سرمایه‌گذاری را بدون استفاده از این ابزار شروع نکنید.</div>
+
+<main>
+  <section class="card">
+    <h2><span class="num">۱</span> مفروضات کلی</h2>
+    <p class="hint">اعداد را ساده و تقریبی هم بنویسید؛ هر زمان خواستید اصلاح کنید.</p>
+    <label class="q">واحد پولی که با آن کار می‌کنید</label>
+    <select id="unit">
+      <option>تومان</option><option>میلیون تومان</option><option selected>میلیارد تومان</option><option>ریال</option><option>دلار</option>
+    </select>
+    <div class="grid">
+      <div>
+        <label class="q">حداقل بازده مورد انتظار شما در سال (درصد)<br><small class="hint">نرخ تنزیل؛ مثلاً سودی که اگر پول را جای دیگر (سپرده، دلار، طلا، کسب‌وکار دیگر) بگذارید می‌گیرید</small></label>
+        <input type="text" id="rate" inputmode="decimal" value="30">
+      </div>
+      <div>
+        <label class="q">نرخ تورم سالانه پیش‌بینی‌شده (درصد)<br><small class="hint">فقط وقتی اعمال می‌شود که پایین گزینه «به قیمت امروز» را انتخاب کنید</small></label>
+        <input type="text" id="infl" inputmode="decimal" value="30">
+      </div>
+    </div>
+    <label class="q">اعداد سال‌ها را چطور می‌نویسید؟<br><small class="hint">«مبلغ واقعی همان سال» یعنی پولی که پیش‌بینی می‌کنید در آن سال دریافت/پرداخت شود (همراه با اثر تورم). «به قیمت امروز» یعنی ارزش آن را با قدرت خرید امروز می‌نویسید و ابزار تورم را اضافه می‌کند</small></label>
+    <select id="mode"><option value="nominal" selected>مبلغ واقعی همان سال (پیش‌فرض، پیشنهادی)</option><option value="today">به قیمت امروز (تورم اعمال شود)</option></select>
+    <label class="q">پروژه چند سال طول می‌کشد؟</label>
+    <div class="stepper"><button type="button" id="minus">−</button><b id="yrs">۵</b><button type="button" id="plus">+</button><span class="hint" style="margin:0">سال (حداکثر ۱۵)</span></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">۲</span> سرمایه‌گذاری اولیه (لحظه صفر)</h2>
+    <label class="q">امروز، در لحظه شروع پروژه، چقدر سرمایه باید اختصاص دهید؟<small class="hint" style="display:block;margin:0">زمین، تجهیزات، ساخت، سرمایه در گردش اولیه و ...</small></label>
+    <div class="row"><input type="text" id="i0" inputmode="numeric" placeholder="مثلاً 10"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">۳</span> جریان نقدی هر سال</h2>
+    <p class="hint">برای هر سال، خالص پول واردشده منهای پول خارج‌شده را بنویسید. دکمه <b>+</b> یعنی برداشت/دریافت سود دارید؛ دکمه <b>−</b> یعنی در آن سال باید پول بگذارید (مثلاً توسعه یا زیان).</p>
+    <div id="years"></div>
+    <label class="q" style="border-top:1px dashed var(--line);padding-top:10px">در پایان پروژه، دارایی‌ها را چقدر می‌توانید بفروشید؟ (اختیاری)<small class="hint" style="display:block;margin:0">ارزش باقیمانده؛ اگر چیزی نمی‌فروشید خالی بگذارید</small></label>
+    <div class="row"><input type="text" id="salv" inputmode="numeric" placeholder="۰"></div>
+  </section>
+
+  <button class="btn" id="go">محاسبه NPV 🧮</button>
+  <div class="err" id="err"></div>
+
+  <section class="card" id="result" style="margin-top:22px">
+    <h2>📊 نتیجه محاسبه</h2>
+    <div class="big" id="big"></div>
+    <div class="note gold">این عدد صرفاً بر اساس <b>داده‌هایی است که خودتان اعلام کردید</b>؛ اگر پیش‌بینی‌ها واقعی نباشد، نتیجه هم واقعی نخواهد بود.</div>
+    <div id="meaning"></div>
+    <h2 style="margin-top:18px;font-size:1rem">ارزش امروزیِ هر دوره</h2>
+    <div class="bars" id="bars"></div>
+    <div style="overflow-x:auto"><table id="tbl"></table></div>
+    <div class="note" id="sens"></div>
+  </section>
+
+  <section class="card cta">
+    <h2>مشاوره مدیریت و کسب و کار</h2>
+    <p>برای بررسی دقیق‌تر پروژه، تدوین مدل مالی و تصمیم‌گیری مطمئن‌تر، با کارشناسان مرکز توسعه کسب و کار ایران-بریتانیا در ارتباط باشید.</p>
+    <a class="ig" href="https://instagram.com/1minmanager" target="_blank" rel="noopener">اینستاگرام: 1minmanager</a>
+    <a class="wa" href="https://wa.me/989995148384" target="_blank" rel="noopener">واتساپ مرکز</a>
+  </section>
+</main>
+<footer>نتایج این ابزار جنبه آموزشی و کمک‌تصمیم دارد و جایگزین مشاوره تخصصی نیست. © مرکز توسعه کسب و کار ایران-بریتانیا</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const FA='۰۱۲۳۴۵۶۷۸۹',AR='٠١٢٣٤٥٦٧٨٩';
+const clean=s=>String(s).replace(/[۰-۹]/g,d=>FA.indexOf(d)).replace(/[٠-٩]/g,d=>AR.indexOf(d)).replace(/[٬,،\s]/g,'').replace('٫','.');
+const parse=s=>parseFloat(clean(s))||0;
+const fa=n=>Math.round(n*100)/100;
+const fmt=n=>fa(n).toLocaleString('fa-IR',{maximumFractionDigits:2});
+const toFa=n=>String(n).replace(/\d/g,d=>FA[d]);
+let n=5;const signs=Array(16).fill(1);
+
+function money(el){el.addEventListener('input',()=>{
+  let v=clean(el.value).replace(/[^0-9.]/g,'');
+  const p=v.split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  el.value=p.length>1?p[0]+'.'+p[1]:p[0];});}
+
+function build(){
+  const keep={};document.querySelectorAll('.cf').forEach(e=>keep[e.dataset.i]=e.value);
+  let h='';
+  for(let t=1;t<=n;t++){
+    h+=`<div class="yr"><label class="q">سال ${toFa(t)}: چقدر برداشت می‌کنید یا باید بگذارید؟<small>خالص ورودی منهای خروجی نقدی در سال ${toFa(t)}</small></label>
+    <div class="row"><div class="sign"><button type="button" class="p ${signs[t]>0?'on':''}" data-s="${t}" data-v="1">+</button><button type="button" class="m ${signs[t]<0?'on':''}" data-s="${t}" data-v="-1">−</button></div>
+    <input type="text" class="cf" data-i="${t}" inputmode="numeric" placeholder="۰" value="${keep[t]||''}"></div></div>`;
+  }
+  $('years').innerHTML=h;
+  document.querySelectorAll('.cf').forEach(money);
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{
+    const t=+b.dataset.s;signs[t]=+b.dataset.v;
+    const r=b.parentNode;r.children[0].classList.toggle('on',signs[t]>0);r.children[1].classList.toggle('on',signs[t]<0);
+    if(done)calc();});
+  $('yrs').textContent=toFa(n);
+}
+let done=false;
+$('minus').onclick=()=>{if(n>1){n--;build();}};
+$('plus').onclick=()=>{if(n<15){n++;build();}};
+['i0','salv'].forEach(i=>money($(i)));
+['rate','infl'].forEach(i=>$(i).addEventListener('input',()=>{}));
+build();
+
+function npvAt(r,infl,i0,cfs,salv){
+  let v=-i0;const rows=[{t:0,nom:-i0,pv:-i0}];
+  for(let t=1;t<=cfs.length;t++){
+    let c=cfs[t-1]+(t===cfs.length?salv:0);
+    const nom=c*Math.pow(1+infl,t),pv=nom/Math.pow(1+r,t);
+    v+=pv;rows.push({t,nom,pv});
+  }
+  return {v,rows};
+}
+function calc(){
+  $('err').textContent='';
+  const r=parse($('rate').value)/100,infl=$('mode').value==='today'?parse($('infl').value)/100:0,i0=parse($('i0').value),salv=parse($('salv').value);
+  if(i0<=0){$('err').textContent='لطفاً مبلغ سرمایه‌گذاری اولیه را بنویسید.';return;}
+  if(r<=-1){$('err').textContent='نرخ بازده معتبر نیست.';return;}
+  const cfs=[];for(let t=1;t<=n;t++){const e=document.querySelector(`.cf[data-i="${t}"]`);cfs.push(signs[t]*parse(e.value));}
+  if(cfs.every(c=>c===0)&&salv===0){$('err').textContent='حداقل جریان نقدی یکی از سال‌ها را بنویسید.';return;}
+  const {v,rows}=npvAt(r,infl,i0,cfs,salv),u=$('unit').value;
+  const cls=Math.abs(v)<i0*0.005?'zero':v>0?'pos':'neg';
+  $('big').className='big '+cls;
+  $('big').innerHTML=`<small>ارزش فعلی خالص (NPV)</small><div class="v">${v<0?'−':''}${fmt(Math.abs(v))} ${u}</div><small>${cls==='pos'?'✅ پروژه بر اساس داده‌های شما ارزش‌آفرین است':cls==='neg'?'⛔ پروژه بر اساس داده‌های شما ارزش‌شکن است':'⚖️ پروژه در آستانه سر‌به‌سر است'}</small>`;
+  let m='';
+  if(cls==='pos')m=`<div class="note">یعنی: اگر پیش‌بینی‌های شما محقق شود، پروژه علاوه بر اینکه سرمایه ${fmt(i0)} ${u} شما را برمی‌گرداند و بازده ${fmt(r*100)}٪ سالانه را می‌دهد، <b>حدود ${fmt(v)} ${u} (به ارزش امروز) ارزش اضافه</b> هم می‌سازد. در این حالت، از نظر مالی پروژه قابل ادامه است؛ البته ریسک‌ها و حساسیت‌ها را هم بسنجید.</div>`;
+  else if(cls==='neg')m=`<div class="note">یعنی: با این مفروضات، پروژه نمی‌تواند حتی بازده حداقلی ${fmt(r*100)}٪ را بدهد و <b>حدود ${fmt(Math.abs(v))} ${u} (به ارزش امروز) از ارزش پول شما کم می‌شود</b>. اگر پروژه را همین‌طور شروع کنید، گزینه جایگزین (مثل سپرده‌گذاری یا سرمایه‌گذاری دیگر) سود بهتری دارد. فروش، هزینه یا زمان‌بندی پروژه را بازنگری کنید.</div>`;
+  else m=`<div class="note">یعنی: پروژه تقریباً فقط همان بازده حداقلی مورد انتظار شما را می‌دهد؛ نه ارزش اضافه می‌سازد و نه ارزش را از بین می‌برد. تصمیم به ریسک و مزایای غیرمالی بستگی دارد.</div>`;
+  $('meaning').innerHTML=m;
+  const mx=Math.max(...rows.map(x=>Math.abs(x.pv)))||1;
+  $('bars').innerHTML=rows.map(x=>`<div class="b"><span class="l">${x.t?'سال '+toFa(x.t):'لحظه صفر'}</span><span class="t"><i style="width:${Math.max(2,Math.abs(x.pv)/mx*100)}%;background:${x.pv<0?'#c23a3a':'#17855a'}"></i></span><span style="width:90px;text-align:left" class="${x.pv<0?'neg-t':'pos-t'}">${x.pv<0?'−':'+'}${fmt(Math.abs(x.pv))}</span></div>`).join('');
+  $('tbl').innerHTML=`<tr><th>دوره</th><th>جریان نقدی همان سال</th><th>ارزش امروز</th></tr>`+rows.map(x=>`<tr><td>${x.t?'سال '+toFa(x.t):'لحظه صفر'}</td><td class="${x.nom<0?'neg-t':'pos-t'}">${x.nom<0?'−':'+'}${fmt(Math.abs(x.nom))}</td><td class="${x.pv<0?'neg-t':'pos-t'}">${x.pv<0?'−':'+'}${fmt(Math.abs(x.pv))}</td></tr>`).join('');
+  const lo=npvAt(r+0.05,infl,i0,cfs,salv).v,hi=npvAt(Math.max(r-0.05,-0.99),infl,i0,cfs,salv).v;
+  const sg=x=>(x<0?'−':'')+fmt(Math.abs(x));
+  $('sens').innerHTML=`🔍 <b>آزمون حساسیت:</b> اگر بازده مورد انتظارتان ۵ واحد درصد بیشتر (${fmt(r*100+5)}٪) باشد، NPV برابر ${sg(lo)} ${u} می‌شود؛ و اگر ۵ واحد کمتر (${fmt(r*100-5)}٪) باشد، ${sg(hi)} ${u}. ${(lo>0)===(hi>0)?'علامت NPV در هر دو حالت یکسان است؛ نتیجه نسبت به نرخ مقاوم است.':'علامت NPV تغییر می‌کند؛ پروژه به نرخ بازده حساس است و باید با احتیاط بیشتر تصمیم بگیرید.'}`;
+  done=true;$('result').style.display='block';
+  $('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('go').onclick=calc;
+</script>
+</body>
+</html>
